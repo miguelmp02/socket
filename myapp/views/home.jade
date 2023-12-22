@@ -1,0 +1,36 @@
+extends layout
+
+block content
+  h1 Bienvenido a la Sala de Chat
+
+  // Área de chat
+  #chat-container
+    #chat-messages
+
+  // Formulario para enviar mensajes
+  form#chat-form
+    input#mensaje(type='text', placeholder='Escribe tu mensaje...')
+    button(type='button', onclick='enviarMensaje()') Enviar
+
+  script(src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js')
+  script.
+    const socket = io();
+    const chatMessages = document.getElementById('chat-messages');
+    const chatForm = document.getElementById('chat-form');
+    const mensajeInput = document.getElementById('mensaje');
+
+    // Configurar el nombre de usuario
+    const usuario = prompt('Ingresa tu nombre de usuario:');
+    socket.usuario = usuario;
+
+    // Manejar el evento de nuevo mensaje
+    socket.on('mensaje', (data) => {
+      chatMessages.innerHTML += `<p><strong>${data.usuario}:</strong> ${data.mensaje}</p>`;
+    });
+
+    // Función para enviar mensajes
+    function enviarMensaje() {
+      const mensaje = mensajeInput.value;
+      socket.emit('nuevo-mensaje', mensaje);
+      mensajeInput.value = '';
+    }
